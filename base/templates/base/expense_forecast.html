@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Forecast</title>
+</head>
+<body>
+    <h1>Expense Forecast for Next 30 Days</h1>
+    <img src="/{{ plot_file }}" alt="Expense Forecast Plot">
+    <h2>Total Forecasted Expenses: {{ total_forecasted_expenses }}</h2>
+    <h3>Forecast Data</h3>
+    <ul>
+        {% for data in forecast_data %}
+            <li>{{ data.Date }}: {{ data.Forecasted_Expenses }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goals</title>
+    <link
+    rel="icon"
+    href=
+"https://img.myloview.com/stickers/fb-letter-linked-logo-for-business-and-company-identity-initial-letter-fb-logo-vector-template-700-271062079.jpg"
+    type="image/x-icon"
+/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb7K5i8eZXYRm/yexLrQzJ3zJ5R7s1F3M8suF" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+        }
+        .container {
+            padding: 20px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h2 {
+            margin: 0;
+        }
+        .add-goal-button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        .add-goal-button:hover {
+            background-color: #0056b3;
+        }
+        .add-goal-button i {
+            margin-right: 5px;
+        }
+        .goals-list {
+            display: grid;
+            gap: 20px;
+        }
+        .goal-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            text-align: left;
+        }
+        .goal-card h3 {
+            margin: 0 0 10px 0;
+        }
+        .goal-card p {
+            margin: 5px 0;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-bar-fill {
+            height: 20px;
+            background-color: #007bff;
+            width: 0;
+            transition: width 0.3s ease-in-out;
+            text-align: right; /* Ensure text alignment */
+            color: #fff; /* Text color */
+            padding: 0 5px; /* Padding for text */
+        }
+        .achieved-goals {
+            margin-top: 40px;
+        }
+        .achieved-goals h3 {
+            margin-bottom: 10px;
+        }
+        .achieved-goals .goal-card {
+            background-color: #d3edda;
+            border-color: #6cbf73;
+        }
+        .goal_tit{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand-logo img {
+            height: 40px;
+        }
+        .auth-buttons a {
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        .auth-buttons a:hover {
+            background-color: #0056b3;
+        }
+        nav {
+            background-color: #004d40;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav .nav-links {
+            display: flex;
+            justify-content: space-around;
+            flex-grow: 1;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+        }
+        nav a:hover {
+            background-color: #00796b;
+        }
+        .active {
+            background-color: #00796b;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="brand-logo">
+            <img src="https://img.myloview.com/stickers/fb-letter-linked-logo-for-business-and-company-identity-initial-letter-fb-logo-vector-template-700-271062079.jpg" alt="Finance Buddy Logo">
+        </div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}" class="active">Dashboard</a>
+            <a href="{% url 'expense_trac' %}">Transaction Table</a>
+            <a href="#">Expense Prediction</a>
+            <a href="#">Financial News</a>
+            <a href="#">Notifications</a>
+        </div>
+        
+        <div class="auth-buttons">
+            {% if user.is_authenticated %}
+                <span>Welcome, {{ user.username }}!</span>
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="container">
+        <div class="header">
+            <h2>My Goals</h2>
+            <a href="{% url 'goal_add' %}" class="add-goal-button">
+                <i class="fas fa-plus"></i> Add Goal
+            </a>
+        </div>
+        
+        <div class="goals-list">
+            {% for goal in goals %}
+                <div class="goal-card">
+                    <div class="goal_tit">
+                    <h2>{{ goal.name }}</h2>
+                    <a href="{% url 'goal_edit' goal.pk %}"><i class="fas fa-edit icon edit-icon"></i></a>
+                    </div>
+                    <h3>Days Remaining: {{ goal.days_remaining }}</h3>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width:{{ goal.progress_percentage }}%">{{ goal.progress_percentage }}%</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="achieved-goals">
+            <h3>Achieved Goals</h3>
+            {% if achieved_goals %}
+                <div class="goals-list">
+                    {% for goal in achieved_goals %}
+                        <div class="goal-card">
+                            <h3>{{ goal.name }}</h3>
+                            
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No achieved goals yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

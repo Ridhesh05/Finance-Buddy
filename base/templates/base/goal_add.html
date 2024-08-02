@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if goal %}Edit Goal{% else %}Add Goal{% endif %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb7K5i8eZXYRm/yexLrQzJ3zJ5R7s1F3M8suF" crossorigin="anonymous">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+        }
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-container h2 {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function validateForm(event) {
+            const desiredDate = document.getElementById('desired_date').value;
+            const currentDate = new Date().toISOString().split('T')[0];
+            
+            if (desiredDate < currentDate) {
+                event.preventDefault();
+                document.getElementById('error-message').innerText = 'The desired date cannot be in the past.';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>{% if goal %}Edit Goal{% else %}Add Goal{% endif %}</h2>
+        <div class="form-container">
+            <form method="POST" onsubmit="validateForm(event)">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">Goal Name</label>
+                    <input type="text" id="name" name="name" value="{{ goal.name|default_if_none:'' }}">
+                </div>
+                <div class="form-group">
+                    <label for="target_amount">Target Amount (₹)</label>
+                    <input type="number" id="target_amount" name="target_amount" min="0" step="0.01" value="{{ goal.target_amount|default_if_none:'' }}">
+                </div>
+                <div class="form-group">
+                    <label for="saved_already">Amount Saved Already (₹)</label>
+                    <input type="number" id="saved_already" name="saved_already" min="0" step="0.01" value="{{ goal.saved_already|default_if_none:'' }}">
+                </div>
+                <div class="form-group">
+                    <label for="date">Desired Date</label>
+                    <input type="date" id="desired_date" name="desired_date" value="{{ goal.desired_date|default_if_none:''|date:'Y-m-d' }}">
+                </div>
+                <div class="form-group">
+                    <label for="note">Note</label>
+                    <textarea id="note" name="note" rows="3">{{ goal.note|default_if_none:'' }}</textarea>
+                </div>
+                <div class="form-group">
+                    <button type="submit">{% if goal %}Save Changes{% else %}Add Goal{% endif %}</button>
+                </div>
+                <div id="error-message" class="error"></div>
+            </form>
+        </div>
+        <a href="{% url 'goal_list' %}">Back to Goals</a>
+    </div>
+</body>
+</html>

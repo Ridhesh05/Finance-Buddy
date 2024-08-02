@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Prediction</title>
+    <link rel="icon" href="https://img.myloview.com/stickers/fb-letter-linked-logo-for-business-and-company-identity-initial-letter-fb-logo-vector-template-700-271062079.jpg" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb7K5i8eZXYRm/yexLrQzJ3zJ5R7s1F3M8suF" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Your existing CSS styles */
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        nav {
+            background-color: #004d40;
+            color: #fff;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        nav .nav-links {
+            display: flex;
+            justify-content: space-around;
+            flex-grow: 1;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+        }
+        nav a:hover, nav a.active {
+            background-color: #00796b;
+            border-radius: 5px;
+        }
+        .brand-logo img {
+            height: 50px;
+        }
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+        }
+        .auth-buttons a {
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-left: 10px;
+            color: #fff;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .auth-buttons a:hover {
+            background-color: #0056b3;
+        }
+        .container {
+            padding: 40px;
+            max-width: 1200px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="brand-logo">
+            <img src="https://img.myloview.com/stickers/fb-letter-linked-logo-for-business-and-company-identity-initial-letter-fb-logo-vector-template-700-271062079.jpg" alt="Finance Buddy Logo">
+        </div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'expense_trac' %}">Transaction</a>
+            <a href="#" class="active">Expense Prediction</a>
+            <a href="{% url 'blog' %}">Financial News</a>
+            <a href="#">Notifications</a>
+        </div>
+        
+        <div class="auth-buttons">
+            {% if user.is_authenticated %}
+                <span>Welcome, {{ user.username }}!</span>
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="container">
+        {% if forecast_plot %}
+            <img src="data:image/png;base64,{{ forecast_plot }}" alt="Expense Forecast">
+            <ul id="forecast-list"></ul>
+        {% else %}
+            <p>No expense data available for forecasting.</p>
+        {% endif %}
+        <div>
+            <h3>Model Accuracy Metrics</h3>
+            <p>Mean Absolute Error (MAE): {{ mae }}</p>
+            <p>Mean Squared Error (MSE): {{ mse }}</p>
+            <p>Root Mean Squared Error (RMSE): {{ rmse }}</p>
+            <p>Mape (MAPE):{{ mape }}%</p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Forecast List
+        const forecastLabels = JSON.parse('{{ forecast_labels|escapejs }}');
+        const forecastValues = JSON.parse('{{ forecast_values|escapejs }}');
+        const forecastList = document.getElementById('forecast-list');
+
+        if (forecastLabels.length > 0 && forecastValues.length > 0) {
+            forecastLabels.forEach((label, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${label}: ₹${forecastValues[index]}`;
+                forecastList.appendChild(listItem);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Buddy</title>
+    <link rel="icon" href="https://img.myloview.com/stickers/fb-letter-linked-logo-for-business-and-company-identity-initial-letter-fb-logo-vector-template-700-271062079.jpg" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+        }
+        nav {
+            background-color: #004d40;
+            color: #fff;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        nav .nav-links {
+            display: flex;
+            justify-content: space-around;
+            flex-grow: 1;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+        }
+        nav a:hover, nav a.active {
+            background-color: #00796b;
+            border-radius: 5px;
+        }
+        .brand-logo img {
+            height: 40px;
+        }
+        .auth-buttons a {
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-left: 10px;
+            color: #fff;
+            text-decoration: none;
+        }
+        .auth-buttons a:hover {
+            background-color: #0056b3;
+        }
+        .container {
+            padding: 20px;
+            background-color: #fff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #00796b;
+            color: #fff;
+        }
+        .icon {
+            cursor: pointer;
+            color: #333;
+        }
+        .icon:hover {
+            color: #007bff;
+        }
+        .receipt-img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            margin: 0 5px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            color: #00796b;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .pagination a:hover {
+            background-color: #00796b;
+            color: #fff;
+        }
+        .pagination .active {
+            background-color: #00796b;
+            color: #fff;
+            border: 1px solid #00796b;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="brand-logo">
+            <img src="https://img.myloview.com/stickers/fb-letter-linked-logo-for-business-and-company-identity-initial-letter-fb-logo-vector-template-700-271062079.jpg" alt="Finance Buddy Logo">
+        </div>
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="#" class="active">Transaction</a>
+            <a href="#">Expense Prediction</a>
+            <a href="{% url 'blog' %}">Financial News</a>
+            <i class="fas fa-bell"></i>
+        </div>
+        <div class="auth-buttons">
+            {% if user.is_authenticated %}
+                <span>Welcome, {{ user.username }}!</span>
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="container">
+        <h2>Expense History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        Date
+                        <a href="?sort_expense=created_at&order_expense={% if order_expense == 'asc' and sort_by_expense == 'created_at' %}desc{% else %}asc{% endif %}&sort_income={{ sort_by_income }}&order_income={{ order_income }}" class="sortable">
+                            {% if sort_by_expense == 'created_at' %}
+                                {% if order_expense == 'asc' %}
+                                    <i class="fas fa-arrow-up"></i>
+                                {% else %}
+                                    <i class="fas fa-arrow-down"></i>
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Receipt</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expense_page_obj %}
+                <tr>
+                    <td>{{ expense.created_at|date:"m/d/Y" }}</td>
+                    <td>{{ expense.type }}</td>
+                    <td>₹{{ expense.amount }}</td>
+                    <td>
+                        {% if expense.receipt %}
+                        <a href="{{ expense.receipt.url }}" target="_blank">
+                            <img src="{{ expense.receipt.url }}" alt="Receipt" class="receipt-img">
+                        </a>
+                        {% else %}
+                        No Receipt
+                        {% endif %}
+                    </td>
+                    <td><a href="{% url 'expense_edit' expense.id %}"><i class="fas fa-edit icon"></i></a></td>
+                    <td><a href="{% url 'expense_delete' expense.id %}"><i class="fas fa-trash icon"></i></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="pagination">
+            <span class="page-number">
+                {% if expense_page_obj.has_previous %}
+                    <a href="?expense_page={{ expense_page_obj.previous_page_number }}&sort_expense={{ sort_by_expense }}&order_expense={{ order_expense }}&sort_income={{ sort_by_income }}&order_income={{ order_income }}">Previous</a>
+                {% endif %}
+                <span class="current">Page {{ expense_page_obj.number }} of {{ expense_page_obj.paginator.num_pages }}</span>
+                {% if expense_page_obj.has_next %}
+                    <a href="?expense_page={{ expense_page_obj.next_page_number }}&sort_expense={{ sort_by_expense }}&order_expense={{ order_expense }}&sort_income={{ sort_by_income }}&order_income={{ order_income }}">Next</a>
+                {% endif %}
+            </span>
+        </div>
+
+        <h2>Income Tracking</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        <a href="?sort_income=date&order_income={% if order_income == 'asc' and sort_by_income == 'date' %}desc{% else %}asc{% endif %}&sort_expense={{ sort_by_expense }}&order_expense={{ order_expense }}" class="sortable">
+                            Date
+                            {% if sort_by_income == 'date' %}
+                                {% if order_income == 'asc' %}
+                                    <i class="fas fa-arrow-up"></i>
+                                {% else %}
+                                    <i class="fas fa-arrow-down"></i>
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>Income Type</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for income in income_page_obj %}
+                <tr>
+                    <td>{{ income.date }}</td>
+                    <td>{{ income.income_type }}</td>
+                    <td>₹{{ income.income }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="pagination">
+            <span class="page-number">
+                {% if income_page_obj.has_previous %}
+                    <a href="?income_page={{ income_page_obj.previous_page_number }}&sort_income={{ sort_by_income }}&order_income={{ order_income }}&sort_expense={{ sort_by_expense }}&order_expense={{ order_expense }}">Previous</a>
+                {% endif %}
+                <span class="current">Page {{ income_page_obj.number }} of {{ income_page_obj.paginator.num_pages }}</span>
+                {% if income_page_obj.has_next %}
+                    <a href="?income_page={{ income_page_obj.next_page_number }}&sort_income={{ sort_by_income }}&order_income={{ order_income }}&sort_expense={{ sort_by_expense }}&order_expense={{ order_expense }}">Next</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+</body>
+</html>

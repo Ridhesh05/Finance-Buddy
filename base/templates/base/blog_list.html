@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance News</title>
+    <link rel="icon" href="https://img.myloview.com/stickers/fb-letter-linked-logo-for-business-and-company-identity-initial-letter-fb-logo-vector-template-700-271062079.jpg" type="image/x-icon"/>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #e5e5e5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 850px;
+            margin: 20px auto;
+            flex-grow: 1;
+        }
+        nav {
+            background-color: #004d40;
+            color: #fff;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links {
+            display: flex;
+            justify-content: space-around;
+            flex-grow: 1;
+            gap:30px;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+        }
+        nav a:hover, nav a.active {
+            background-color: #00796b;
+            border-radius: 5px;
+        }
+        .auth-buttons a {
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-left: 10px;
+            text-decoration: none;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        .auth-buttons a:hover {
+            background-color: #80baf7;
+        }
+        .welcome-text {
+            color: #fff;
+            margin-right: 10px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        li:hover {
+            background-color: #f1f1f1;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        li a {
+            display: block;
+            text-decoration: none;
+            color: #0073e6;
+            padding: 15px;
+            font-size: 18px;
+        }
+        li a:hover {
+            color: #005bb5;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            margin: 0 5px;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #0073e6;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .pagination a:hover {
+            background-color: #0073e6;
+            color: #fff;
+        }
+        .pagination a.disabled {
+            pointer-events: none;
+            color: #ccc;
+            border-color: #ccc;
+        }
+        .brand-logo img {
+            height: 40px;
+        }
+        .nav-container {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="brand-logo">
+                <img src="https://img.myloview.com/stickers/fb-letter-linked-logo-for-business-and-company-identity-initial-letter-fb-logo-vector-template-700-271062079.jpg" alt="Finance Buddy Logo">
+            </div>
+            <div class="nav-links">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="#" class="active">Transaction</a>
+                <a href="#">Expense Prediction</a>
+                <a href="{% url 'blog' %}">Financial News</a>
+            </div>
+        </div>
+        <div class="nav-container">
+            {% if user.is_authenticated %}
+                <span class="welcome-text">Welcome, {{ user.username }}!</span>
+                <a href="{% url 'logout' %}" class="auth-buttons">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="auth-buttons">Login</a>
+                <a href="{% url 'register' %}" class="auth-buttons">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Finance News</h1>
+        <ul>
+            {% for blog in page_obj %}
+                <li>
+                    <a href="{{ blog.link }}" target="_blank">{{ blog.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% else %}
+                <a class="disabled">Previous</a>
+            {% endif %}
+            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+               
+            {% else %}
+                <a class="disabled">Next</a>
+                
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
