@@ -3,19 +3,21 @@ from datetime import timedelta
 from datetime import datetime, timedelta
 import os 
 from django.urls import reverse_lazy
+import environ
 
+# Initialize environment variables
+env = environ.Env(
+    DEBUG=(bool, False)
+)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-60j3)9u=qze124j@h7fpo*op!ea$ewgzm!2s7onb-vf0*b*@a3'
+DEBUG = env('DEBUG')
+SECRET_KEY = env('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 INSTALLED_APPS = [
     'jazzmin',
     'base',

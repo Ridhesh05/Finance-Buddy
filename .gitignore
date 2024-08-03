@@ -137,3 +137,9 @@ cython_debug/
 
 # Django migrations
 */migrations/
+
+
+
+# Docker
+*.log
+docker-compose.override.yml
