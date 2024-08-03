@@ -6,10 +6,9 @@ from django.urls import reverse_lazy
 import environ
 
 # Initialize environment variables
-env = environ.Env(
-    DEBUG=(bool, False)
-)
 
+env = environ.Env()
+environ.Env.read_env()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -27,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'import_export',
 ]
 
 MIDDLEWARE = [

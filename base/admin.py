@@ -1,8 +1,10 @@
 from django.contrib import admin
 from .models import Expense, DailyIncome,Goal,Blog,Notification,Profile
+from import_export.admin import ImportExportModelAdmin
 
-class ExpenseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'date', 'amount', 'user','id')
+
+class ExpenseAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ('name', 'type', 'date', 'amount', 'user', 'id')
     list_filter = ('type', 'user')
     search_fields = ('name', 'description')
     
@@ -36,3 +38,6 @@ admin.site.register(Blog)
 admin.site.register(Notification)
 
 admin.site.register(Profile)
+
+
+
