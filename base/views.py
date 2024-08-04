@@ -5,13 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_protect
-from .models import Expense, DailyIncome,Goal,Blog
+from .models import Expense, DailyIncome,Goal,Blog,Profile
 from django.contrib.auth.models import User, auth
 from decimal import Decimal
 import json
 from django.shortcuts import get_object_or_404
 from decimal import Decimal
 from django.utils.timezone import now
+from django.core.exceptions import ObjectDoesNotExist
 from statsmodels.tsa.arima.model import ARIMA
 import numpy as np
 import pandas as pd
@@ -34,6 +35,7 @@ import matplotlib.pyplot as plt
 @login_required
 def dashboard(request):
     user = request.user
+    profile = Profile.objects.get(user = request.user)
     expenses = Expense.objects.filter(user=user)
 
     total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or Decimal('0')
@@ -58,6 +60,7 @@ def dashboard(request):
         'expense_data_values': json.dumps(expense_data_values),
         'income_labels': json.dumps(income_labels),
         'income_data_values': json.dumps(income_data_values),
+        'profile':profile,
     }
     return render(request, 'base/dashboard.html', context)
 
@@ -343,11 +346,23 @@ def predict(request):
     }
     return render(request, 'base/predict.html', context)
 
+@login_required
+def profile(request):
+    try:
+        profile = Profile.objects.get(user = request.user)
+    except ObjectDoesNotExist:
+        profile = Profile(user=request.user, name=request.user.username, email=request.user.email)
+    if request.method == 'POST':
+        profile.name = request.user.username
+        profile.email = request.user.email
+        profile.dob = request.POST.get('dob',profile.dob)
+        profile.gender = request.POST.get('gender',profile.gender)
+        if 'profile_photo' in request.FILES:
+            profile.profile_photo = request.FILES['profile_photo']
 
-def profile(request, pk):
-    user = get_object_or_404(User, pk=pk)
-    name = user.username
-    email = user.email
-    context = {'user': user, 'name': name, 'email': email}
+        profile.save()
+        return redirect('dashboard')
+    context ={
+        'profile': profile,
+    }    
     return render(request, 'base/profile.html', context)
-    

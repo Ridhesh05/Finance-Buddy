@@ -3,99 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
+    <title>Profile</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: 'Roboto', sans-serif;
             background-color: #f4f4f9;
             color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .banner {
+            background-color: #03816c;
+            color: #fff;
+            padding: 40px 20px;
+            height:45%;
+            width:100%;
+            text-align: center;
+            position: absolute;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .banner h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .profile-photo-container {
+            display: flex;
+            justify-content: center;
+            margin-top: -50px;
+            position: relative;
+            top:238px;
+            right: 38%;
+        }
+
+        .profile-photo-container img {
+            border-radius: 50%;
+            border: 5px solid #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            
         }
 
         .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            max-width: 1000px;
+            margin: 0 auto;
             padding: 20px;
-        }
-
-        .profile-card {
-            background: #fff;
-            border-radius: 10px;
+            background-color: #fff;
+            border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            padding: 30px;
+            position: relative;
+            top: 290px; 
         }
 
-        .profile-image {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 20px;
-        }
-
-        .profile-name {
-            font-size: 1.8em;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .profile-email {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-            color: #777;
-        }
-
-        .profile-actions {
+        form {
             display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .btn {
-            padding: 10px 20px;
+        p {
+            margin: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            color: #004d40;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="email"], input[type="date"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="file"] {
+            margin-top: 5px;
+        }
+
+        button {
+            background-color: #00796b;
+            color: #fff;
             border: none;
+            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            transition: background 0.3s ease;
-            text-decoration: none;
-            color: white;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            align-self: center;
         }
 
-        .btn-edit {
-            background-color: #007bff;
+        button:hover {
+            background-color: #004d40;
         }
-
-        .btn-edit:hover {
-            background-color: #0056b3;
-        }
-
-        .btn-logout {
-            background-color: #dc3545;
-        }
-
-        .btn-logout:hover {
-            background-color: #c82333;
-        }
-
     </style>
 </head>
 <body>
+    <div class="banner">
+        
+    </div>
+    <div class="profile-photo-container">
+        {% if profile.profile_photo %}
+            <img src="{{ profile.profile_photo.url }}" alt="Profile Photo">
+        {% endif %}
+    </div>
     <div class="container">
-        <div class="profile-card">
-            <img src="https://via.placeholder.com/100" alt="User Profile Image" class="profile-image">
-            <h1 class="profile-name">{{ name }}</h1>
-            <p class="profile-email">{{ email }}</p>
-            <div class="profile-actions">
-               
-                <a href="{% url 'logout' %}" class="btn btn-logout">Logout</a>
-            </div>
-        </div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" value="{{ profile.name }}">
+            </p>
+            <p>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{ profile.email }}">
+            </p>
+            <p>
+                <label for="profile_photo">Upload New Profile Photo:</label>
+                <input type="file" id="profile_photo" name="profile_photo">
+            </p>
+            <p>
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" name="dob" value="{{ profile.dob|date:'Y-m-d' }}">
+            </p>
+            <p>
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender">
+                    <option value="MALE" {% if profile.gender == 'MALE' %}selected{% endif %}>Male</option>
+                    <option value="FEMALE" {% if profile.gender == 'FEMALE' %}selected{% endif %}>Female</option>
+                </select>
+            </p>
+            <button type="submit">Save</button>
+        </form>
     </div>
 </body>
 </html>

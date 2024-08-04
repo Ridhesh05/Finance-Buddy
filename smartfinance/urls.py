@@ -21,7 +21,7 @@ urlpatterns = [
     path('goal/<int:pk>/edit/',views.goal_edit,name = 'goal_edit'),
     path('blog/',views.blog_list,name = 'blog'),
     path('predict/',views.predict,name = 'predict'),
-    path('profile/<int:pk>/', views.profile, name='profile'),
+    path('profile/', views.profile, name='profile'),
     path('__debug__/', include('debug_toolbar.urls')),
 
 ]

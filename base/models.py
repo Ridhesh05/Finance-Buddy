@@ -136,7 +136,7 @@ class Profile(models.Model):
         ('MALE', 'Male'),
         ('FEMALE', 'Female'),
     ]
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)    
     name = models.CharField(max_length=200)
     profile_photo = models.ImageField(upload_to='profile_photos/', max_length=255)
     email = models.EmailField(unique=True)
@@ -145,4 +145,3 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.name
-
