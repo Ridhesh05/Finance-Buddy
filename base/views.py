@@ -286,6 +286,9 @@ def blog_list(request):
 def predict(request):
     user = request.user
     expenses = Expense.objects.filter(user=user)
+    if(expenses.count()<30*7):
+        return render(request, 'base/insufficient_data.html', {'message': 'You need at least 7 months of expense data to access this feature.'})
+
     expense_df = pd.DataFrame(list(expenses.exclude(type='INCOME').values('created_at', 'amount')))
     
     if not expense_df.empty:
@@ -293,26 +296,19 @@ def predict(request):
         expense_df.set_index('created_at', inplace=True)
         expense_df = expense_df.resample('D').sum()  # Daily expense aggregation
 
-        # Ensure there are no missing dates
         expense_df = expense_df.asfreq('D', fill_value=0)
         expense_df['amount'] = pd.to_numeric(expense_df['amount'])
 
-        # Split data into training and testing sets
         train_size = int(len(expense_df) * 0.8)
         train, test = expense_df[0:train_size], expense_df[train_size:]
 
         model = ARIMA(train, order=(1, 1, 1))
         model_fit = model.fit()
         
-        # Generate predictions
         forecast = model_fit.forecast(steps=len(test))
-        
-        # Calculate error metrics
         mse = mean_squared_error(test['amount'], forecast)
         rmse = np.sqrt(mse)
         mae = mean_absolute_error(test['amount'], forecast)
-        
-        # Forecast for next 90 days (approximately 3 months)
         full_model = ARIMA(expense_df, order=(1, 1, 1)).fit()
         forecast_next_90 = full_model.forecast(steps=90)
         forecast_labels = [(expense_df.index[-1] + pd.DateOffset(days=i)).strftime('%Y-%m-%d') for i in range(1, 91)]
@@ -342,7 +338,6 @@ def predict(request):
         'forecast_labels': forecast_labels,
         'forecast_values': forecast_values,
         'forecast_plot': forecast_plot,
-        
     }
     return render(request, 'base/predict.html', context)
 
