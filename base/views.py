@@ -281,15 +281,29 @@ def blog_list(request):
     return render(request, 'base/blog_list.html', {'page_obj': page_obj, 'blogs': blogs})
 
 
-
 @login_required
 def predict(request):
     user = request.user
-    expenses = Expense.objects.filter(user=user)
-    if(expenses.count()<30*7):
-        return render(request, 'base/insufficient_data.html', {'message': 'You need at least 7 months of expense data to access this feature.'})
+    expenses = Expense.objects.filter(user=user).exclude(type='INCOME')
+    
+    # Calculate the total number of transactions
+    total_transactions = expenses.count()
 
-    expense_df = pd.DataFrame(list(expenses.exclude(type='INCOME').values('created_at', 'amount')))
+    # Calculate the total number of months of data
+    if total_transactions > 0:
+        first_transaction_date = expenses.earliest('created_at').created_at
+        last_transaction_date = expenses.latest('created_at').created_at
+        total_months = (last_transaction_date.year - first_transaction_date.year) * 12 + (last_transaction_date.month - first_transaction_date.month) + 1
+    else:
+        total_months = 0
+
+    if total_months < 7 or total_transactions < 1000:
+        messages.warning(request, 'You need at least 7 months of expense data and 1,000 transactions to access this feature.')
+        return redirect('dashboard')
+
+
+    # Existing logic for predicting expenses
+    expense_df = pd.DataFrame(list(expenses.values('created_at', 'amount')))
     
     if not expense_df.empty:
         expense_df['created_at'] = pd.to_datetime(expense_df['created_at'])

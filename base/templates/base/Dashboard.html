@@ -182,9 +182,8 @@
         
         }
     .simple {
-    color: #fff; /* Example: Set color to white */
-    font-size: 16px; /* Example: Adjust font size */
-    /* Add other styles specific to the simple class here */
+    color: #fff; 
+    font-size: 16px; 
 }
     </style>
 </head>
@@ -197,6 +196,12 @@
             <a href="#" class="active">Dashboard</a>
             <a href="{% url 'expense_trac' %}">Transaction</a>
             <a href="{% url 'predict' %}">Expense Prediction</a>
+            {% if messages %}
+                 {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
             <a href="{% url 'blog' %}">Financial News</a>
             <a href="#">Notifications</a>
         </div>
